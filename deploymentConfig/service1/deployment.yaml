@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-svcacc
+  namespace: demo
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: demo-service
+  namespace: demo
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: demo-service
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: demo-service
+    app.kubernetes.io/part-of: demo
+    app.kubernetes.io/version: v1
+  name: demo-service
+  namespace: demo
+spec:
+  selector:
+    matchLabels:
+      app: demo-service
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: demo-service
+        version: "v1"
+    spec:
+      containers:
+        - name: demo-dept
+          image: lhou/demo:v1
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            requests:
+              cpu: 100m
+      serviceAccountName: demo-svcacc

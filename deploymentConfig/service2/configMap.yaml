@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-service
+  namespace: demo
+data:
+  demo-service-url: http://demo-service:8080/hello
